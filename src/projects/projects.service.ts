@@ -1,22 +1,15 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { RedisService } from '../redis/redis.service';
 import { BrokerService } from '../broker/broker.service';
 import { ProjectCreatedEvent } from '../events/schemas/project-created.event';
-
-export interface Project {
-  id: string;
-  name: string;
-  description?: string;
-  ownerId: string;
-}
+import { ProjectsRepository } from './repositories/projects.repository';
+import { ProjectResponseDto } from './dto/project.response.dto';
 
 @Injectable()
 export class ProjectsService implements OnModuleInit {
   private readonly logger = new Logger(ProjectsService.name);
-  private readonly PROJECTS_KEY = 'projects'; // Global list of projects
 
   constructor(
-    private readonly redisService: RedisService,
+    private readonly projectsRepository: ProjectsRepository,
     private readonly brokerService: BrokerService,
   ) {}
 
@@ -31,33 +24,29 @@ export class ProjectsService implements OnModuleInit {
     }
   }
 
-  private async handleProjectCreated(event: ProjectCreatedEvent) {
+  private async handleProjectCreated(event: ProjectCreatedEvent): Promise<void> {
     this.logger.log(`Received project.created event for project ${event.id}`);
-    
-    const projects = await this.getProjects();
-    
-    if (!projects.some(p => p.id === event.id)) {
-      const newProject: Project = {
-        id: event.id,
-        name: event.name,
-        description: event.description,
-        ownerId: event.ownerId,
-      };
-      
-      projects.push(newProject);
-      await this.redisService.set(this.PROJECTS_KEY, projects);
-      this.logger.log(`Project ${event.id} saved to Redis read model`);
-    } else {
-      this.logger.log(`Project ${event.id} already exists in read model, skipping`);
+
+    const projects = await this.projectsRepository.findAll();
+
+    if (projects.some((p) => p.id === event.id)) {
+      this.logger.debug(`Project ${event.id} already exists in read model, skipping`);
+      return;
     }
+
+    const newProject: ProjectResponseDto = {
+      id: event.id,
+      name: event.name,
+      description: event.description,
+      ownerId: event.ownerId,
+    };
+
+    projects.push(newProject);
+    await this.projectsRepository.saveAll(projects);
+    this.logger.log(`Project ${event.id} saved to Redis read model`);
   }
 
-  async getProjects(): Promise<Project[]> {
-    try {
-      const projects = await this.redisService.get<Project[]>(this.PROJECTS_KEY);
-      return projects || [];
-    } catch {
-      return [];
-    }
+  async getProjects(): Promise<ProjectResponseDto[]> {
+    return this.projectsRepository.findAll();
   }
 }
