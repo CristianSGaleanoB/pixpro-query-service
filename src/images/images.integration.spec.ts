@@ -1,7 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
-import { ImagesService, ProjectImage } from './images.service';
+import { ImagesService } from './images.service';
+import { ImagesRepository } from './repositories/images.repository';
 import { RedisService } from '../redis/redis.service';
+import { ImageResponseDto } from './dto/image.response.dto';
 
 const TEST_PROJECT_ID = 'integration-test-project';
 const TEST_IMAGE_ID = 'integration-test-image-1';
@@ -27,11 +29,8 @@ describe('ImagesService (Integration)', () => {
       ],
       providers: [
         ImagesService,
+        ImagesRepository,
         RedisService,
-        {
-          provide: 'BrokerService',
-          useValue: mockBrokerService,
-        },
         {
           provide: require('../broker/broker.service').BrokerService,
           useValue: mockBrokerService,
@@ -61,7 +60,7 @@ describe('ImagesService (Integration)', () => {
     });
 
     it('should return image list from Redis', async () => {
-      const seed: ProjectImage[] = [
+      const seed: ImageResponseDto[] = [
         {
           id: TEST_IMAGE_ID,
           projectId: TEST_PROJECT_ID,
@@ -95,7 +94,9 @@ describe('ImagesService (Integration)', () => {
         processingOptions: { upscaler: true, grayscale: false, restore: false },
       };
 
-      await (imagesService as unknown as Record<string, Function>).handleImageUploaded(uploadedEvent);
+      await (imagesService as unknown as Record<string, Function>).handleImageUploaded(
+        uploadedEvent,
+      );
 
       const images = await imagesService.getProjectImages(TEST_PROJECT_ID);
       expect(images).toHaveLength(1);
@@ -111,7 +112,7 @@ describe('ImagesService (Integration)', () => {
 
   describe('handleImageProcessed', () => {
     it('should update image status to complete in Redis', async () => {
-      const seed: ProjectImage[] = [
+      const seed: ImageResponseDto[] = [
         {
           id: TEST_IMAGE_ID,
           projectId: TEST_PROJECT_ID,
@@ -130,7 +131,9 @@ describe('ImagesService (Integration)', () => {
         resultUrl: 'https://cdn.example.com/result/photo-processed.jpg',
       };
 
-      await (imagesService as unknown as Record<string, Function>).handleImageProcessed(processedEvent);
+      await (imagesService as unknown as Record<string, Function>).handleImageProcessed(
+        processedEvent,
+      );
 
       const images = await imagesService.getProjectImages(TEST_PROJECT_ID);
       expect(images).toHaveLength(1);

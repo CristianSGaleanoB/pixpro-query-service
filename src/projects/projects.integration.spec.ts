@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
-import { ProjectsService, Project } from './projects.service';
+import { ProjectsService } from './projects.service';
+import { ProjectsRepository } from './repositories/projects.repository';
 import { RedisService } from '../redis/redis.service';
 
 const TEST_PROJECT_ID = 'test-proj-int-001';
@@ -26,11 +27,8 @@ describe('ProjectsService (Integration)', () => {
       ],
       providers: [
         ProjectsService,
+        ProjectsRepository,
         RedisService,
-        {
-          provide: 'BrokerService',
-          useValue: mockBrokerService,
-        },
         {
           provide: require('../broker/broker.service').BrokerService,
           useValue: mockBrokerService,
