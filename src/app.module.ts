@@ -7,7 +7,9 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { BrokerModule } from './broker/broker.module';
 import { RedisModule } from './redis/redis.module';
-import { QueriesModule } from './queries/queries.module';
+import { EventsModule } from './events/events.module';
+import { ProjectsModule } from './projects/projects.module';
+import { ImagesModule } from './images/images.module';
 
 @Module({
   imports: [
@@ -18,7 +20,9 @@ import { QueriesModule } from './queries/queries.module';
     AuthModule,
     BrokerModule,
     RedisModule,
-    QueriesModule,
+    EventsModule,
+    ProjectsModule,
+    ImagesModule,
   ],
   providers: [
     {
