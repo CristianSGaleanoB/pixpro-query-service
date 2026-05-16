@@ -1,12 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { RedisService } from '../redis/redis.service';
 import { BrokerService } from '../broker/broker.service';
-
-export interface Project {
-  id: string;
-  name: string;
-  description?: string;
-}
+import { ImageUploadedEvent } from '../events/schemas/image-uploaded.event';
 
 export type ImageStatus = 'idle' | 'uploading' | 'processing' | 'complete' | 'error';
 
@@ -28,11 +23,9 @@ export interface ImageProcessedEvent {
   resultUrl: string;
 }
 
-import { ImageUploadedEvent } from '../events/schemas/image-uploaded.event';
-
 @Injectable()
-export class QueriesService implements OnModuleInit {
-  private readonly logger = new Logger(QueriesService.name);
+export class ImagesService implements OnModuleInit {
+  private readonly logger = new Logger(ImagesService.name);
 
   constructor(
     private readonly redisService: RedisService,
@@ -49,7 +42,7 @@ export class QueriesService implements OnModuleInit {
       );
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      this.logger.warn(`Could not subscribe to broker — RabbitMQ may be unavailable: ${message}`);
+      this.logger.warn(`Could not subscribe to broker for image events: ${message}`);
     }
   }
 
@@ -63,7 +56,7 @@ export class QueriesService implements OnModuleInit {
       const newImage: ProjectImage = {
         id: imageId,
         projectId,
-        filename: storagePath.split('/').pop() || 'image',
+        filename: storagePath?.split('/').pop() || 'image',
         sizeBytes: 0,
         uploadDate: new Date().toISOString(),
         status: 'processing',
@@ -99,15 +92,6 @@ export class QueriesService implements OnModuleInit {
       this.logger.log(`Redis cache updated for image ${imageId} in project ${projectId}`);
     } else {
       this.logger.warn(`Image ${imageId} not found in cached list for project ${projectId}`);
-    }
-  }
-
-  async getProjects(): Promise<Project[]> {
-    try {
-      const projects = await this.redisService.get<Project[]>('projects');
-      return projects || [];
-    } catch {
-      return [];
     }
   }
 
