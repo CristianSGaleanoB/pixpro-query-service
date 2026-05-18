@@ -7,7 +7,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   private readonly client: Redis;
 
   constructor(private readonly configService: ConfigService) {
-    const redisUrl = this.configService.get<string>('REDIS_URL', 'redis://localhost:6379');
+    const redisUrl = this.configService.getOrThrow<string>('redis.url');
     this.client = new Redis(redisUrl, {
       lazyConnect: true,
       maxRetriesPerRequest: 0,
