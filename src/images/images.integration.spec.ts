@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ImagesService } from './images.service';
 import { ImagesRepository } from './repositories/images.repository';
 import { RedisService } from '../redis/redis.service';
+import { BrokerService } from '../broker/broker.service';
 import { ImageResponseDto } from './dto/image.response.dto';
 
 const TEST_PROJECT_ID = 'integration-test-project';
@@ -32,7 +33,7 @@ describe('ImagesService (Integration)', () => {
         ImagesRepository,
         RedisService,
         {
-          provide: require('../broker/broker.service').BrokerService,
+          provide: BrokerService,
           useValue: mockBrokerService,
         },
       ],
@@ -94,9 +95,9 @@ describe('ImagesService (Integration)', () => {
         processingOptions: { upscaler: true, grayscale: false, restore: false },
       };
 
-      await (imagesService as unknown as Record<string, Function>).handleImageUploaded(
-        uploadedEvent,
-      );
+      await (
+        imagesService as unknown as Record<string, (arg: unknown) => Promise<void>>
+      ).handleImageUploaded(uploadedEvent);
 
       const images = await imagesService.getProjectImages(TEST_PROJECT_ID);
       expect(images).toHaveLength(1);
@@ -131,9 +132,9 @@ describe('ImagesService (Integration)', () => {
         resultUrl: 'https://cdn.example.com/result/photo-processed.jpg',
       };
 
-      await (imagesService as unknown as Record<string, Function>).handleImageProcessed(
-        processedEvent,
-      );
+      await (
+        imagesService as unknown as Record<string, (arg: unknown) => Promise<void>>
+      ).handleImageProcessed(processedEvent);
 
       const images = await imagesService.getProjectImages(TEST_PROJECT_ID);
       expect(images).toHaveLength(1);

@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ProjectsService } from './projects.service';
 import { ProjectsRepository } from './repositories/projects.repository';
 import { RedisService } from '../redis/redis.service';
+import { BrokerService } from '../broker/broker.service';
 
 const TEST_PROJECT_ID = 'test-proj-int-001';
 const TEST_PROJECTS_KEY = 'projects';
@@ -30,7 +31,7 @@ describe('ProjectsService (Integration)', () => {
         ProjectsRepository,
         RedisService,
         {
-          provide: require('../broker/broker.service').BrokerService,
+          provide: BrokerService,
           useValue: mockBrokerService,
         },
       ],
@@ -69,7 +70,9 @@ describe('ProjectsService (Integration)', () => {
         timestamp: new Date().toISOString(),
       };
 
-      await (projectsService as unknown as Record<string, Function>).handleProjectCreated(event);
+      await (
+        projectsService as unknown as Record<string, (arg: unknown) => Promise<void>>
+      ).handleProjectCreated(event);
 
       const projects = await projectsService.getProjects();
       expect(projects).toHaveLength(1);
@@ -88,8 +91,12 @@ describe('ProjectsService (Integration)', () => {
         timestamp: new Date().toISOString(),
       };
 
-      await (projectsService as unknown as Record<string, Function>).handleProjectCreated(event);
-      await (projectsService as unknown as Record<string, Function>).handleProjectCreated(event);
+      await (
+        projectsService as unknown as Record<string, (arg: unknown) => Promise<void>>
+      ).handleProjectCreated(event);
+      await (
+        projectsService as unknown as Record<string, (arg: unknown) => Promise<void>>
+      ).handleProjectCreated(event);
 
       const projects = await projectsService.getProjects();
       expect(projects).toHaveLength(1);
