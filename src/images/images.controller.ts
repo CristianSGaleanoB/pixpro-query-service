@@ -1,6 +1,5 @@
 import { Controller, Get, Param, HttpCode, HttpStatus, ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { Public } from '../auth/decorators/public.decorator';
 import { ImagesService } from './images.service';
 import { ImageResponseDto } from './dto/image.response.dto';
 
@@ -10,7 +9,6 @@ export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}
 
   @Get('projects/:projectId/images')
-  @Public()
   @ApiOperation({ summary: 'Get all images for a specific project' })
   @ApiParam({ name: 'projectId', description: 'The unique identifier of the project (UUID)' })
   @ApiResponse({

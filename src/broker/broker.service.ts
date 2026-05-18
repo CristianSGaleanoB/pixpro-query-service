@@ -16,6 +16,10 @@ export class BrokerService implements OnModuleInit, OnModuleDestroy {
 
   private readonly queues = [
     {
+      name: 'project.created',
+      routingKey: 'project.created',
+    },
+    {
       name: 'pixpro.image.uploaded',
       routingKey: 'image.uploaded',
     },

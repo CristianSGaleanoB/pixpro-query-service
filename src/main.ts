@@ -38,12 +38,12 @@ async function bootstrap() {
     .addTag('queries')
     .addBearerAuth()
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document);
 
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('port') ?? 3001;
+  const port = configService.get<number>('port') ?? 2000;
   const prefix = 'api';
 
   await app.listen(port);

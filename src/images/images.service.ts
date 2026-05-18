@@ -21,7 +21,7 @@ export class ImagesService implements OnModuleInit {
 
   async onModuleInit() {
     try {
-      await this.brokerService.subscribe('image.uploaded', async (payload: unknown) =>
+      await this.brokerService.subscribe('pixpro.image.uploaded', async (payload: unknown) =>
         this.handleImageUploaded(payload as ImageUploadedEvent),
       );
       await this.brokerService.subscribe('pixpro.image.processed', async (payload: unknown) =>
