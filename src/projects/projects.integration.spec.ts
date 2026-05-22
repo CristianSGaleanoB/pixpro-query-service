@@ -54,7 +54,7 @@ describe('ProjectsService (Integration)', () => {
 
   describe('getProjects', () => {
     it('should return empty array if no projects in Redis', async () => {
-      const projects = await projectsService.getProjects();
+      const projects = await projectsService.getProjects('user-123');
       expect(projects).toEqual([]);
     });
   });
@@ -63,21 +63,27 @@ describe('ProjectsService (Integration)', () => {
     it('should add project to Redis when event is received', async () => {
       const event = {
         event: 'ProjectCreated',
-        id: TEST_PROJECT_ID,
-        name: 'Test Project',
-        description: 'Integration test',
-        ownerId: 'user-123',
+        version: '1.0',
         timestamp: new Date().toISOString(),
+        correlationId: 'test-correlation-id',
+        _id: TEST_PROJECT_ID,
+        name: 'Test Project',
+        ownerId: 'user-123',
+        tags: [],
+        totalImages: 0,
+        processedImages: 0,
+        status: 'active',
+        isPublic: false,
       };
 
       await (
         projectsService as unknown as Record<string, (arg: unknown) => Promise<void>>
       ).handleProjectCreated(event);
 
-      const projects = await projectsService.getProjects();
+      const projects = await projectsService.getProjects('user-123');
       expect(projects).toHaveLength(1);
       expect(projects[0]).toMatchObject({
-        id: TEST_PROJECT_ID,
+        _id: TEST_PROJECT_ID,
         name: 'Test Project',
       });
     });
@@ -85,10 +91,17 @@ describe('ProjectsService (Integration)', () => {
     it('should not add duplicate project', async () => {
       const event = {
         event: 'ProjectCreated',
-        id: TEST_PROJECT_ID,
+        version: '1.0',
+        timestamp: new Date().toISOString(),
+        correlationId: 'test-correlation-id',
+        _id: TEST_PROJECT_ID,
         name: 'Test Project',
         ownerId: 'user-123',
-        timestamp: new Date().toISOString(),
+        tags: [],
+        totalImages: 0,
+        processedImages: 0,
+        status: 'active',
+        isPublic: false,
       };
 
       await (
@@ -98,7 +111,7 @@ describe('ProjectsService (Integration)', () => {
         projectsService as unknown as Record<string, (arg: unknown) => Promise<void>>
       ).handleProjectCreated(event);
 
-      const projects = await projectsService.getProjects();
+      const projects = await projectsService.getProjects('user-123');
       expect(projects).toHaveLength(1);
     });
   });
