@@ -1,6 +1,10 @@
 export class ProjectResponseDto {
-  id: string;
+  _id: string;
   name: string;
-  description?: string;
   ownerId: string;
+  tags: string[];
+  totalImages: number;
+  processedImages: number;
+  status: string;
+  isPublic: boolean;
 }
