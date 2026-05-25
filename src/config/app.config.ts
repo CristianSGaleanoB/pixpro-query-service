@@ -18,4 +18,15 @@ export const appConfig = () => ({
     exchange: process.env.RABBITMQ_EXCHANGE || 'pixpro.events',
     exchangeType: process.env.RABBITMQ_EXCHANGE_TYPE || 'topic',
   },
+  tls: {
+    certPath: process.env.TLS_CERT_PATH ?? 'certs/cert.pem',
+    keyPath: process.env.TLS_KEY_PATH ?? 'certs/key.pem',
+    wssPort: parseInt(process.env.WSS_PORT ?? '8443', 10),
+  },
+  cors: {
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  },
+  websocket: {
+    maxConnections: parseInt(process.env.WS_MAX_CONNECTIONS || '100', 10),
+  },
 });
