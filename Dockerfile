@@ -3,7 +3,7 @@ FROM node:22-alpine AS base
 ENV HUSKY=0
 RUN npm install -g pnpm
 WORKDIR /app
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --ignore-scripts
 
@@ -21,7 +21,7 @@ FROM node:22-alpine AS production
 
 RUN npm install -g pnpm
 WORKDIR /app
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
 RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 COPY --from=build /app/dist ./dist
 
