@@ -1,8 +1,14 @@
 export interface ProjectCreatedEvent {
   event: 'ProjectCreated';
-  id: string;
-  name: string;
-  description?: string;
-  ownerId: string;
+  version: string;
   timestamp: string;
+  correlationId: string;
+  _id: string;
+  name: string;
+  ownerId: string;
+  tags: string[];
+  totalImages: number;
+  processedImages: number;
+  status: string;
+  isPublic: boolean;
 }

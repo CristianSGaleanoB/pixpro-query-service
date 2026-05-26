@@ -8,6 +8,17 @@
  * See: https://jestjs.io/docs/manual-mocks
  */
 
+export class JwksClient {
+  constructor() {}
+
+  getSigningKey(
+    _kid: string,
+    cb: (err: Error | null, key: { getPublicKey: () => string } | undefined) => void,
+  ): void {
+    cb(null, { getPublicKey: () => 'mock-public-key' });
+  }
+}
+
 export const passportJwtSecret =
   () =>
   (_requestHeaders: unknown, _token: unknown, cb: (err: Error | null, key?: string) => void) => {

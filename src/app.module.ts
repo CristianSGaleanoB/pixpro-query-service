@@ -10,6 +10,7 @@ import { RedisModule } from './redis/redis.module';
 import { EventsModule } from './events/events.module';
 import { ProjectsModule } from './projects/projects.module';
 import { ImagesModule } from './images/images.module';
+import { WebsocketModule } from './websocket/websocket.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ImagesModule } from './images/images.module';
     EventsModule,
     ProjectsModule,
     ImagesModule,
+    WebsocketModule,
   ],
   providers: [
     {

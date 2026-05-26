@@ -20,6 +20,14 @@ export class BrokerService implements OnModuleInit, OnModuleDestroy {
       routingKey: 'project.created',
     },
     {
+      name: 'project.updated',
+      routingKey: 'project.updated',
+    },
+    {
+      name: 'project.deleted',
+      routingKey: 'project.deleted',
+    },
+    {
       name: 'pixpro.image.uploaded',
       routingKey: 'image.uploaded',
     },
